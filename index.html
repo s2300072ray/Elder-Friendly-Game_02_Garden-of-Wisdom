@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Garden of Wisdom</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ['"Atkinson Hyperlegible"', 'sans-serif'],
+            },
+            colors: {
+              'garden-cream': '#fbf7f0',
+              'garden-dark': '#4a4036',
+              'garden-green': '#6b8c42',
+              'garden-green-dark': '#4a6728',
+              'garden-orange': '#e89c4a',
+              'garden-blue': '#7bb5c4',
+            }
+          }
+        }
+      }
+    </script>
+    <style>
+      body {
+        background-color: #fbf7f0;
+        color: #4a4036;
+      }
+      /* Disable text selection for better game feel */
+      .no-select {
+        user-select: none;
+        -webkit-user-select: none;
+      }
+    </style>
+  <script type="importmap">
+{
+  "imports": {
+    "react/": "https://aistudiocdn.com/react@^19.2.1/",
+    "react": "https://aistudiocdn.com/react@^19.2.1",
+    "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.1/",
+    "lucide-react": "https://aistudiocdn.com/lucide-react@^0.556.0",
+    "@google/genai": "https://aistudiocdn.com/@google/genai@^1.32.0"
+  }
+}
+</script>
+</head>
+  <body>
+    <div id="root"></div>
+  </body>
+</html>
