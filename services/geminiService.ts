@@ -1,17 +1,50 @@
+
 import { GoogleGenAI } from "@google/genai";
 import { FeedbackData } from "../types";
 
-// Initialize Gemini
-// Note: In a real production app, this key should be proxied or handled securely.
-// For this demo, we assume the environment variable is available.
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY || '' });
+// Safety Check:
+// We only initialize the client if the key exists to prevent errors.
+// In a real production environment, ensure you have set up HTTP Referrer restrictions
+// in the Google Cloud Console to prevent unauthorized usage of your key.
+
+const apiKey = process.env.API_KEY;
+const ai = apiKey ? new GoogleGenAI({ apiKey: apiKey }) : null;
+
+// Fallback messages to ensure the game works 100% offline or if the API quota is exceeded.
+const FALLBACK_MESSAGES = {
+  success: [
+    "Wonderful job! You are doing great.",
+    "Your garden is blooming beautifully.",
+    "Excellent focus and patience today.",
+    "You have a gentle touch with nature."
+  ],
+  retry: [
+    "That was a good try. Let's try again gently.",
+    "Take your time, there is no rush.",
+    "Nature grows at its own pace, and so do we.",
+    "Every attempt helps your garden grow."
+  ],
+  facts: [
+    "Did you know? Sunflowers track the sun across the sky!",
+    "Earthworms are the heroes of healthy soil.",
+    "Trees communicate with each other through their roots.",
+    "Gardening can lower stress and improve mood.",
+    "Bees dance to tell others where flowers are."
+  ]
+};
+
+const getRandom = (arr: string[]) => arr[Math.floor(Math.random() * arr.length)];
 
 export const getEncouragement = async (gameName: string, score: number, success: boolean): Promise<FeedbackData> => {
-  if (!process.env.API_KEY) {
+  // 1. COST SAVING & SAFETY: 
+  // If no API Key is provided, immediately return local data. 
+  // This ensures zero cost and zero crashes for public demos.
+  if (!ai || !apiKey) {
+    console.log("Running in offline mode (No API Key found).");
     return {
-      message: success ? "Wonderful job! You are doing great." : "That was a good try. Let's try again gently.",
+      message: success ? getRandom(FALLBACK_MESSAGES.success) : getRandom(FALLBACK_MESSAGES.retry),
       isPositive: success,
-      fact: "Did you know? Sunflowers track the sun across the sky!"
+      fact: getRandom(FALLBACK_MESSAGES.facts)
     };
   }
 
@@ -50,11 +83,15 @@ export const getEncouragement = async (gameName: string, score: number, success:
     };
 
   } catch (error) {
-    console.error("Gemini API Error:", error);
+    // 2. ROBUSTNESS:
+    // If the API call fails (network error, quota exceeded, invalid key),
+    // we silently fall back to local messages so the user experience is never interrupted.
+    console.warn("Gemini API skipped or failed, using offline fallback.", error);
+    
     return {
-      message: success ? "Wonderful job! You are doing great." : "That was a good try. Take your time.",
+      message: success ? getRandom(FALLBACK_MESSAGES.success) : getRandom(FALLBACK_MESSAGES.retry),
       isPositive: success,
-      fact: "Gardening is good for the soul."
+      fact: getRandom(FALLBACK_MESSAGES.facts)
     };
   }
 };
